@@ -15,6 +15,9 @@ struct thread {
   void* initial_argument;
 };
 
+
+void thread_switch(struct thread * old, struct thread * new);
+
 #endif 
 
 
