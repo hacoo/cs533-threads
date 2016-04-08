@@ -1,0 +1,50 @@
+Writeup for CS533 Assignement 1
+
+Context Switching
+
+Implementation:
+
+I followed the assignment instructions basically to the letter. I chose
+to keep testing / project specific functions in hw1.c (since I don't want 
+them to clutter later code).
+
+I tested by attempting thread switches to the 'fun_with_threads' function.
+I examined register values in GDB to confirm that the stack pointer, etc, 
+was being transferred correctly.
+
+Discussion:
+
+1.
+A queue would be a natural data structure for managing many threads.
+A queue would be preferable to, say, a stack, for fairness (i.e., threads
+waiting longer get to run sooner).
+
+The obvious disadvantage to a queue is the need for a linear search if 
+the desired thread is not at the top of the queue. There's a few ways 
+to solve this; a separate hash table of threads could be kept (at the 
+expense of memory), or a separate ordered thread list for binary search.
+Whether or not these features are 'worth it' depends on how much memory
+we have to spare, and how many threads we expect to run.
+
+A final desirable feature would be to include thread priorities. A simple
+way to do this would be to keep several lists, one for each priority,
+and check the top-priority list first.
+
+2. 
+The current thread system is not super useful, since any code involving
+only two threads, and no scheduler, can trivially be implemented as 
+sequential code. A scheduler would make thing more useful (that way, 
+a second thread could actually do work independently).
+
+3. 
+Memory management is indeed a problem, since we can't free our thread's
+stack until we actually leave it. A good place to free the stack might
+be after the thread_switch call in yeild(), but this would cause yield()
+to terminate threads PERMANENTLY, which is not desired. So, we should 
+probably create a new kill_thread() function, that yields / swaps out of the
+current thread and then deallocates it.
+
+An alternate method could be to let the scheduler handle this work, by 
+either marking finished threads and deallocating them later (a more 
+'garbage collector' like approach) or before returing to the newly-running
+thread.
