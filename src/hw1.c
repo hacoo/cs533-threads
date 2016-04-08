@@ -6,6 +6,7 @@
 
 #include "hw1.h"
 
+
 int factorial(int n) {
   return (n <= 1) ? 1 : n * factorial(n-1);
 }
@@ -17,17 +18,33 @@ void fun_with_threads(void* arg) {
 }
 
 // For step 1
-int call_clunky_thread_function(thread* current_thread) {
+int call_clunky_thread_function(thread* _current_thread) {
   
   // create an initial argument
   int* p = malloc(sizeof(int));
   *p = 5;
 
-  current_thread = malloc(sizeof(thread));
-  current_thread->initial_function = fun_with_threads;  
-  current_thread->initial_argument = p;
+  _current_thread = malloc(sizeof(thread));
+  _current_thread->initial_function = fun_with_threads;  
+  _current_thread->initial_argument = p;
   // make the call
-  current_thread->initial_function(current_thread->initial_argument);
+  _current_thread->initial_function(_current_thread->initial_argument);
 
   return 0;
 }
+
+
+// For step 2 / 3 / 4
+int try_to_switch_and_segfault_possibly() {
+  int* p = malloc(sizeof(int));
+  *p = 5;
+  current_thread->initial_function = fun_with_threads;  
+  current_thread->initial_argument = p;
+  
+  thread_start(inactive_thread, current_thread);
+
+  return 0;
+}
+
+
+// 

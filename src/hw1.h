@@ -16,5 +16,7 @@
 int factorial(int n);
 void fun_with_threads(void* arg);
 int call_clunky_thread_function(thread* current_thread);
+int try_to_switch_and_segfault_possibly();
+
 
 #endif

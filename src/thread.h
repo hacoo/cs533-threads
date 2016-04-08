@@ -8,6 +8,12 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include "stdio.h"
+#include "stdlib.h"
+
+// Stack size is 1Mb
+#define STACK_SIZE 1048576 
+
 typedef struct thread thread;
 struct thread {
   unsigned char* stack_pointer;
@@ -15,8 +21,12 @@ struct thread {
   void* initial_argument;
 };
 
+thread* current_thread;
+thread* inactive_thread;
 
 void thread_switch(struct thread * old, struct thread * new);
+void yield();
+void thread_wrap();
 
 #endif 
 
