@@ -10,7 +10,7 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include "thread.h"
+#include "scheduler.h"
 
 struct queue_node {
   struct thread * t;
