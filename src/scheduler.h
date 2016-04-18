@@ -11,6 +11,7 @@
 #include "queue.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "unistd.h"
 
 // Stack size is 1Mb
 #define STACK_SIZE 1048576 

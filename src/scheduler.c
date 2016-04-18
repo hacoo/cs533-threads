@@ -7,6 +7,7 @@
 
 #include "scheduler.h"
 
+
 // extern -- visibile to all
 thread* current_thread;
 
@@ -26,6 +27,8 @@ void thread_start(thread* old, thread* new) {
 // Used to start a new thread with requested function
 void thread_wrap() {
   current_thread->initial_function(current_thread->initial_argument);
+  // After completion, mark the thread as done and yield.
+  current_thread->state = DONE;
   yield();
 }
 
@@ -45,10 +48,17 @@ void scheduler_begin() {
   ready_list.tail = NULL;
 }
 
+// End the scheduler. Will continue until there are no more runnable threads.
+void scheduler_end() {
+  while(!is_empty(&ready_list))
+    yield();
+}
+
 // Create a thread with starting function target, and argument
 // arg. Will start immediately.
 void thread_fork(void(*target)(void*), void* arg) {
   // Create a new TCB
+  
   thread* new = malloc(sizeof(thread));
   new->initial_function = target;
   new->initial_argument = arg;
@@ -58,22 +68,43 @@ void thread_fork(void(*target)(void*), void* arg) {
   new->state = RUNNING;
   
   // Save the old thread
-  current_thread->state = READY;
-  thread_enqueue(&ready_list, current_thread);
-  thread* temp = current_thread;
+  thread* old = current_thread;
+  old->state = READY;
+  thread_enqueue(&ready_list, old);
   
   // Swap running threads
   current_thread = new;
-  thread_start(temp, current_thread);
+  thread_start(old, new);
 }
 
 
-// Yield and swap current/active threads
+// Yield to the next available thread
 void yield() {
-  thread* temp = current_thread;
-  current_thread = inactive_thread;
-  inactive_thread = temp;
-  thread_switch(inactive_thread, current_thread);
+  // If the current thread isn't done, swap it.
+  if (current_thread->state != DONE) {
+    
+    // Save old thread in queue
+    thread* old = current_thread;
+    old->state = READY;    
+    thread_enqueue(&ready_list, old);
+    
+    // Swap in the new thread. This is done after enqueue the old
+    // thread, so there is guaranteed to be a waiting thread
+    thread* new = thread_dequeue(&ready_list);
+    new->state = RUNNING;
+    current_thread = new;
+    
+    thread_switch(old, new);
+  }
+  // Otherwise, destroy current_thread and run the next available thread.
+  else {
+    // Currently there is no memory management -- the old TCB is leaked
+    thread* old = current_thread;
+    thread* new = thread_dequeue(&ready_list);
+    current_thread = new;
+    new->state = READY;
+    thread_switch(old, new);
+  }  
 }
 
 
