@@ -15,6 +15,15 @@
 // Stack size is 1Mb
 #define STACK_SIZE 1048576 
 
+typedef enum {
+  RUNNING,
+  READY,
+  BLOCKED,
+  DONE
+} state_t;
+
+//typedef struct thread thread;
+
 typedef struct thread thread;
 struct thread {
   unsigned char* stack_pointer;

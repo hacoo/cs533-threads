@@ -12,18 +12,20 @@
 
 #include "scheduler.h"
 
+typedef struct queue_node queue_node;
 struct queue_node {
   struct thread * t;
   struct queue_node * next;  
 };
 
+typedef struct queue queue;
 struct queue {
   struct queue_node * head;
   struct queue_node * tail;
 };
 
-void thread_enqueue(struct queue * q, struct thread * t);
-struct thread * thread_dequeue(struct queue * q);
-int is_empty(struct queue * q);
+void thread_enqueue(queue * q, struct thread * t);
+struct thread * thread_dequeue(queue * q);
+int is_empty(queue * q);
 
 #endif

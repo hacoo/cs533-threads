@@ -7,6 +7,25 @@
 
 #include "scheduler.h"
 
+// extern -- visibile to all
+thread* current_thread;
+
+// global thread queue
+queue ready_list;
+
+// Start the scheduler and run on current_thread
+void scheduler_begin() {
+  // Allocate the current thread
+  current_thread = malloc(sizeof(thread));
+  // Control flow will continue unthreaded until fork() is called.
+  // At that point, the main thread will be saved in current_thread.
+  // For now, current_thread remains empty.
+
+  // initialize the ready list
+  ready_list.head = NULL;
+  ready_list.tail = NULL;
+}
+
 void thread_switch(thread* old, thread* new) {
   // requires assembly -- implemented in thread_switch.s
   thread_switch_asm(old, new);
