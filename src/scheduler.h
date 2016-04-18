@@ -29,6 +29,7 @@ struct thread {
   unsigned char* stack_pointer;
   void (*initial_function)(void*);
   void* initial_argument;
+  state_t state;
 };
 
 extern thread* current_thread;
