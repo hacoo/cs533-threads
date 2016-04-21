@@ -1,0 +1,34 @@
+To test, I ran the included 'main' program. We should see n2 complete first, then n1, then n3, which I observed.
+
+
+1. Currently, old stack frames are never deallocated. Deallocating the stack is a little problematic
+   because, when a thread exits, it's still running on its own stack until the final yield() call. 
+   So, deallocating would probably cause a seg fault. The most straightforward solution would seem
+   to be to have the scheduler garbage-collect threads that are marked as DONE periodically. This could 
+   be done whenever a thread closes (by having a special terminate() method, maybe), or done when memory
+   is low, or at a given time interval. 
+   
+   That said, there's often no need to actually deallocate stacks, they could simply be reused, saving 
+   some time.
+
+2. Yes, we are running on a thread. We are running on the currently-running thread directly,
+   until the thread_switch or thread_start method is called. Threads to not actually change until the 
+   stack pointer and instruction pointers change.
+
+   I'd say the barrier is when the stack pointer changes, since each threads stack should be more
+   or less private to that thread. 
+
+3. We're missing a bunch of things, but the big one is synchronization. Since the thread library uses
+   cooperative multithreading, this is actually not that big of an issue, but if we go on to use
+   preemtive multithreading, it will be a big problem.
+
+   Currently our thread library doesn't really have any of the features that would actually make it 
+   useful. Threads can't become blocked, so we can't use them to wait for things. They are restricted 
+   to a single physical CPU (although I don't think true parallism is really the goal of this project).
+
+   Another missing feature is the ability to communicate more easily between threads, for example,
+   waking up other threads, broadcasting, sending messages...
+
+   
+
+

@@ -4,9 +4,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "scheduler.h"
-
-#include "scheduler.h"
-#include <stdio.h>
+#include "stdio.h"
 
 void print_nth_prime(void * pn) {
   int n = *(int *) pn;
@@ -32,6 +30,7 @@ void print_nth_prime(void * pn) {
 
 int main(void) {
   scheduler_begin();
+  printf("Running nth prime. The 10000th prime should appear first, then the 20000th, then the 30000th. \n");
   int n1 = 20000, n2 = 10000, n3 = 30000;
 
   thread_fork(print_nth_prime, &n1);

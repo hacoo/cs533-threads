@@ -14,7 +14,7 @@ SOURCES   := $(wildcard $(SRCDIR)/*.$(SRCEXT))
 
 
 OBJECTS   := $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.$(SRCEXT)=.o))
-OBJECTS   += build/thread_switch.o
+OBJECTS   += build/thread_asm.o
 CFLAGS    := -g -Wall # -O3
 LIB       := -lm
 INC       :=
@@ -24,8 +24,8 @@ $(TARGET): $(OBJECTS)
 	$(CC) -o $(TARGET) $(LIB) $^
 	@echo "---- COMPILED OK ----"
 
-build/thread_switch.o: src/thread_switch.s
-	$(CC) -c -o build/thread_switch.o src/thread_switch.s
+build/thread_asm.o: src/thread_asm.s
+	$(CC) -c -o build/thread_asm.o src/thread_asm.s
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(dir $@)
