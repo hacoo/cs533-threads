@@ -101,8 +101,8 @@ void yield() {
     // Currently there is no memory management -- the old TCB is leaked
     thread* old = current_thread;
     thread* new = thread_dequeue(&ready_list);
+    new->state = RUNNING;
     current_thread = new;
-    new->state = READY;
     thread_switch(old, new);
   }  
 }
