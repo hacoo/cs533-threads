@@ -16,12 +16,12 @@ SOURCES   := $(wildcard $(SRCDIR)/*.$(SRCEXT))
 OBJECTS   := $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.$(SRCEXT)=.o))
 OBJECTS   += build/thread_asm.o
 CFLAGS    := -g -Wall # -O3
-LIB       := -lm
+LIB       := -lm -lrt
 INC       :=
 
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."
-	$(CC) -o $(TARGET) $(LIB) $^
+	$(CC) -o $(TARGET) $^ $(LIB) 
 	@echo "---- COMPILED OK ----"
 
 build/thread_asm.o: src/thread_asm.s
