@@ -118,7 +118,8 @@ int main(void) {
   thread_fork(print_nth_prime, &n2);
   thread_fork(print_nth_prime, &n3);
 
-  //thread_fork(read_file_test, NULL);
+  printf("Now loading test file. Each read should print in the same order: \n");
+  thread_fork(read_file_test, NULL);
   sleep(2);
 
   scheduler_end();
