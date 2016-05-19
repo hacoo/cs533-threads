@@ -20,8 +20,9 @@ ssize_t read_wrap (int fd, void* buf, size_t count) {
   if (offset < 0) {
     offset = 0;
     seekable = 0;
+    errno = 0; // Clear the error
   } else {
-    offset = 1;
+    seekable = 1;
   }
 
   // Set up the request control block
@@ -56,12 +57,12 @@ ssize_t read_wrap (int fd, void* buf, size_t count) {
     if (error_code !=  EINPROGRESS) {
       if (error_code == ECANCELED) {
 	printf("Request canceled. \n");
-	errno = aio_return(&request);
-	return -1;
+	errno = error_code;
+	return aio_return(&request);
       } else {
 	printf("ERROR -- aio_read failed with error code: %d\n", error_code);
-	errno = aio_return(&request);
-	return -1;
+	errno = error_code;
+	return aio_return(&request);
       }      
     }
     // Else continue to poll
