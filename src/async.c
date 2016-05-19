@@ -12,13 +12,17 @@
 ssize_t read_wrap (int fd, void* buf, size_t count) {
 
   struct aiocb request;
-  // Get the current offset into the file
+  int seekable;
   off_t offset;
-  if (fd != STDIN_FILENO)
-    offset = lseek(fd, 0, SEEK_CUR);
-  else
+  // Get the current offset into the file, if it is seekable.
+  // If it's not, just use an offset of 0.
+  offset = lseek(fd, 0, SEEK_CUR);
+  if (offset < 0) {
     offset = 0;
-
+    seekable = 0;
+  } else {
+    offset = 1;
+  }
 
   // Set up the request control block
   request.aio_fildes			= fd;
@@ -45,7 +49,8 @@ ssize_t read_wrap (int fd, void* buf, size_t count) {
 
     if (error_code == 0) {
       // If read was succesful, seek the file forward and return
-      lseek(fd, offset+count, SEEK_SET);
+      if (seekable)
+	lseek(fd, offset+count, SEEK_SET);
       return count;
     }
     if (error_code !=  EINPROGRESS) {
