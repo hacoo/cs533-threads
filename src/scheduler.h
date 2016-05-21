@@ -23,7 +23,23 @@ typedef enum {
   DONE
 } state_t;
 
-//typedef struct thread thread;
+struct mutex {
+  int held;
+  struct queue waiting_threads;
+};
+
+void mutex_init(struct mutex*);
+void mutex_lock(struct mutex*);
+void mutex_unlock(struct mutex*);
+
+struct condition {
+  struct queue waiting_threads;
+};
+
+void condition_init(struct condition*);
+void condition_wait(struct condition*, struct mutex*);
+void condition_signal(struct condition*);
+void condition_broadcast(struct condition*);
 
 typedef struct thread thread;
 struct thread {
@@ -31,19 +47,17 @@ struct thread {
   void (*initial_function)(void*);
   void* initial_argument;
   state_t state;
+  struct condition thread_done_cond;
+  struct mutex mtx;
 };
 
 extern thread* current_thread;
 thread* inactive_thread;
 
 void scheduler_begin();
-void thread_fork(void (*target)(void*), void* arg);
+thread* thread_fork(void (*target)(void*), void* arg);
+void thread_join(thread* th);
 void yield();
 void scheduler_end();
-
-
-
-
-
 
 #endif
