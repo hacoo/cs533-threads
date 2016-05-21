@@ -1,0 +1,45 @@
+Henry Cooney
+CS533 - Operating Systems
+Writeup for Assignment 3
+
+Short note:
+
+On my home machine, I am now experiencing seg faults when using the thread_switch and thread_start
+assembly routines. I recently upgraded to Ubuntu 16.04, perhaps this is related? Anyway,
+it seems to run on the Liunx lab machines OK, hopefully you won't have too many problems.
+
+1.
+
+Cooperative multithreading does indeed prevent the need to synchronize.... IF you
+always make sure to free shared resources before a call to yield()! In the case
+of the blocking IO code, this is NOT the case. We haven't given up control of the
+file being read when yield() is called. If another thread were to open the file at
+the same time, things will break.
+
+The main issue here is the file position -- this will not be maintained
+correctly if two threads access a file at once. Since aio_read() uses queueing,
+the data read should be correct, but file position will be updated incorrectly.
+
+2.
+
+The following information would need to be passed to the signal handler:
+
+    - The thread to wake up
+    - Return code information, if not available to the thread
+
+The signal handler would need to find the correct blocked thread and wake
+it up, by re-enqueuing it on the ready list.
+
+Since we don't know when the signal handler will be called, there could be
+a race condition on the ready queue. So, the signal handler would need to
+acquire a lock before manipulating any internal / shared scheduler data.
+
+I'm not super familiar with how signals work, but after googling it sounds
+like the signal handler could be run on basically any available kernel thread in the
+program. This means it could run on a thread which already holds the
+scheduler lock, which would mean instant deadlock. 
+
+To address this, perhaps there is some way to have the signal handler return
+the scheduler to a safe state, wake up the thread, and then resume. But you'd
+have to save the state of the thread that was previously modifying the
+scheduler and rerun it, sounds tricky...

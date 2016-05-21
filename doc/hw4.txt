@@ -1,0 +1,21 @@
+Writeup for CS533 Assignement 4
+
+Synchronization
+
+In order to safely implement a truely concurrent (or preemtable) mutex, we need to either disable
+interupts or have access to an atomic hardware operations.
+
+Since we are running in userland, we are probably not able to disable interrupts, so
+this is not an option.
+
+At a very minimum, we need an atomic test_set_lock() opertion. The main place where we will
+have problems is when locking the mutex, since we must check if the lock is held, then set
+the held variable. If another thread attempts to lock the mutex during this process, all
+bets are off.
+
+Apart from this, I don't THINK we need atomic operations. Mutex_unlock should only ever be
+reached by a thread that already holds the lock, so it's only reachable by one thread at a time
+(as long as the programmer doesn't call unlock() without first calling lock()). Also, mutex_init() isn't
+thread safe, but only one thread should call mutex_init() anyway.
+
+
