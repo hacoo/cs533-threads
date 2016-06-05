@@ -50,7 +50,6 @@ void merge(struct array * A, struct array * B) {
       result[k++] = arr2[j++];
     }
 
-    yield();
   }
 
   if(i >= l1) {
@@ -119,11 +118,19 @@ const char* check_sort(struct array * A) {
   return is_sorted ? "sorted!" : "not sorted!";
 }
 
-int main(void) {
-  scheduler_begin();
+int main(int argc, char ** argv) {
+  if (argc < 4) {
+    fprintf(stderr, "usage: %s num_kthreads array_size seq_threshold\n", argv[0]);
+    exit(1);
+  }
 
-  struct array * A = rand_array(1000000);
-  seq_threshold = 100;
+  int num_kthreads = atoi(argv[1]);
+  int array_size   = atoi(argv[2]);
+  seq_threshold    = atoi(argv[3]);
+
+  struct array * A = rand_array(array_size);
+
+  scheduler_begin(num_kthreads);
 
   printf("before sort: %s\n", check_sort(A));
   par_mergesort(A);

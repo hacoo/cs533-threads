@@ -11,6 +11,11 @@
 #include "queue.h"
 #include <stdlib.h>
 
+// thread-safe malloc macros
+extern void * safe_mem(int, void*);
+#define malloc(arg) safe_mem(0, ((void*)(arg)))
+#define free(arg) safe_mem(1, arg)
+
 void thread_enqueue(struct queue * q, struct thread * t) {
 
   struct queue_node * temp = malloc(sizeof(struct queue_node));
